@@ -12,6 +12,7 @@ class GolGUI:
         self.root = tk.Tk()
         self.root.title("Game of Life")
         self.brush = BaseBrush()
+        self.brushrepr = "Base"
         self.BaseBrush_Button = tk.Button(self.root,text="Base", command=lambda:self.setbrush("Base"))
         self.BaseBrush_Button.pack()
         self.GliderBrush_Button = tk.Button(self.root,text="Glider", command=lambda:self.setbrush("Glider"))
@@ -29,7 +30,7 @@ class GolGUI:
         self.step_button = tk.Button(self.root,text="Step", command=self.step)
         self.step_button.pack()
         self.info = tk.StringVar()
-        self.info.set("Generation: 0")
+        self.info.set(f"Generation: 0 | Alive: 0 | Dead: {GRID_HEIGHT*GRID_WIDTH} | Brush: {self.brushrepr}")
         self.info_Label = tk.Label(self.root, textvariable=self.info)
         self.info_Label.pack()
         self.is_running = False
@@ -81,10 +82,14 @@ class GolGUI:
         elif brushtype == "Pulsar":
             self.brush = PulsarBrush()
 
-        print(brushtype)
+        self.brushrepr = brushtype
 
-    def update_info(self):        
-        self.info.set(f"Generation: {gol.generations}")
+        self.update_info()
+
+    def update_info(self):
+
+        statistics = gol.get_statistics()
+        self.info.set(f"Generation: {statistics["generation"]} | Alive: {statistics["alive"]} | Dead: {statistics["dead"]} | Brush: {self.brushrepr}")
 
 if __name__ == "__main__":
     gol = GOL(GRID_WIDTH, GRID_HEIGHT)
