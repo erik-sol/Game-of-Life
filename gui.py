@@ -26,6 +26,12 @@ class GolGUI:
         self.draw_grid()
         self.start_button = tk.Button(self.root,text="Start", command=self.toggle_running)
         self.start_button.pack()
+        self.step_button = tk.Button(self.root,text="Step", command=self.step)
+        self.step_button.pack()
+        self.info = tk.StringVar()
+        self.info.set("Generation: 0")
+        self.info_Label = tk.Label(self.root, textvariable=self.info)
+        self.info_Label.pack()
         self.is_running = False
         self.root.mainloop()
 
@@ -43,6 +49,7 @@ class GolGUI:
     def step(self):
         self.game.next_state()
         self.draw_grid()
+        self.update_info()
 
     def toggle_cell(self,event):
         col = event.x // CELL_SIZE
@@ -75,6 +82,9 @@ class GolGUI:
             self.brush = PulsarBrush()
 
         print(brushtype)
+
+    def update_info(self):        
+        self.info.set(f"Generation: {gol.generations}")
 
 if __name__ == "__main__":
     gol = GOL(GRID_WIDTH, GRID_HEIGHT)
