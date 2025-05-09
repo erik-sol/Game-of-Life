@@ -13,6 +13,10 @@ class GOL:
             outstring += "\n"
         return outstring
 
+    def board_reset(self):
+        self.board = [[0 for _ in range(self.cols)] for _ in range(self.rows)]
+        self.generations = 0
+
     def set_cell(self, row, col):
         if row >= 0 and row < self.rows and col >= 0 and col < self.cols:
             self.board[row][col] = (self.board[row][col] + 1) % 2
@@ -73,3 +77,7 @@ if __name__ == "__main__":
 
     print("########################################")
     print([[0 for _ in range(gol.cols)] for _ in range(gol.rows)])
+
+    gol.board_reset()
+    print(gol)
+    print(gol.get_statistics())
