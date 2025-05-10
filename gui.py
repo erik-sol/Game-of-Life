@@ -82,12 +82,12 @@ class GolGUI:
     def toggle_cell(self,event):
         col = event.x // CELL_SIZE
         row = event.y // CELL_SIZE
-        self.brush.apply(gol,row,col)
+        self.brush.apply(self.game,row,col)
         self.draw_grid()
 
     def stop(self):
         if messagebox.askyesno("Reset board", "Are you sure you want to reset the board?"):
-            gol.board_reset()
+            self.game.board_reset()
             self.is_running = False
             self.draw_grid()
             self.update_info()
@@ -123,7 +123,7 @@ class GolGUI:
 
     def update_info(self):
 
-        statistics = gol.get_statistics()
+        statistics = self.game.get_statistics()
         self.info.set(f"Generation: {statistics["generation"]} | Alive: {statistics["alive"]} | Dead: {statistics["dead"]} | Brush: {self.brushrepr} | Time: {self.time}")
 
 if __name__ == "__main__":
