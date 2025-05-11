@@ -12,7 +12,7 @@ class GolGUI:
         self.game = gol
         self.root = tk.Tk()
         self.root.title("Game of Life")
-        self.root.geometry("450x550")
+        self.root.geometry("450x600")
         self.brush = BaseBrush()
         self.brushrepr = "Base"
         self.time = 300
@@ -32,6 +32,7 @@ class GolGUI:
         self.canvas = tk.Canvas(self.root, width=GRID_WIDTH*CELL_SIZE, height=GRID_HEIGHT*CELL_SIZE, bg="white")
         self.canvas.grid(row=1, column=0, columnspan=4, padx=5, pady=5)
         self.canvas.bind("<Button-1>", self.toggle_cell)
+        self.canvas.bind("<Button-3>", self.toggle_barricade)
         self.draw_grid()
         self.start_button = tk.Button(self.root,text="⏵", command=self.toggle_running, width="5", background="Green")
         self.start_button.grid(row=2, column=0, padx=5, pady=5, sticky="we")
@@ -43,10 +44,12 @@ class GolGUI:
         self.inc_button.grid(row=2, column=3, padx=5, pady=5, sticky="we")
         self.stop_button = tk.Button(self.root,text="⏹", command=self.stop, width="5", background="Red")
         self.stop_button.grid(row=3, column=0, columnspan=4, padx=5, pady=5, sticky="we")
+        self.step_back_button = tk.Button(self.root,text="⏮", command=self.set_stepback, width="5", background="Blue")
+        self.step_back_button.grid(row=4, column=0, columnspan=4, padx=5, pady=5, sticky="we")
         self.info = tk.StringVar()
         self.info.set(f"Generation: 0 | Alive: 0 | Dead: {GRID_HEIGHT*GRID_WIDTH} | Brush: {self.brushrepr} | Time: {self.time}")
         self.info_Label = tk.Label(self.root, textvariable=self.info)
-        self.info_Label.grid(row=4, column=0, columnspan=4)
+        self.info_Label.grid(row=5, column=0, columnspan=4)
         self.is_running = False
 
         self.root.mainloop()
@@ -85,6 +88,12 @@ class GolGUI:
         self.brush.apply(self.game,row,col)
         self.draw_grid()
 
+    def toggle_barricade(self,event):
+        col = event.x // CELL_SIZE
+        row = event.y // CELL_SIZE
+        self.game.set_barricade(row,col)
+        self.draw_grid()
+
     def stop(self):
         if messagebox.askyesno("Reset board", "Are you sure you want to reset the board?"):
             self.game.board_reset()
@@ -97,7 +106,13 @@ class GolGUI:
         self.canvas.delete("all")
         for r in range(self.game.rows):
             for c in range(self.game.cols):
-                colour = "black" if self.game.board[r][c] == 1 else "white"
+                if self.game.board[r][c] == 1:
+                    colour = "black"
+                elif self.game.board[r][c] == -1:
+                    colour = "red"
+                else:
+                    colour = "white"                
+                
                 self.canvas.create_rectangle(
                     c*CELL_SIZE,
                     r*CELL_SIZE,
@@ -125,6 +140,12 @@ class GolGUI:
 
         statistics = self.game.get_statistics()
         self.info.set(f"Generation: {statistics["generation"]} | Alive: {statistics["alive"]} | Dead: {statistics["dead"]} | Brush: {self.brushrepr} | Time: {self.time}")
+
+    def set_stepback(self):
+        if len(self.game.back_states) > 0:
+            self.game.back_step()
+            self.update_info()
+            self.draw_grid()
 
 if __name__ == "__main__":
     gol = GOL(GRID_WIDTH, GRID_HEIGHT)
